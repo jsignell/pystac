@@ -694,7 +694,7 @@ class CatalogTest(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             catalog = TestCases.test_case_1()
-            catalog_items = catalog.get_all_items()
+            catalog_items = list(catalog.get_all_items())
 
             new_cat = catalog.map_items(item_mapper)
 

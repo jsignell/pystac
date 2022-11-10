@@ -6,6 +6,7 @@ from typing import Any, Dict
 import unittest
 
 import pystac
+import dateutil.relativedelta
 from pystac import Asset, Item
 from pystac.validation import validate_dict
 import pystac.serialization.common_properties
@@ -159,6 +160,40 @@ class ItemTest(unittest.TestCase):
             },
         )
 
+        null_dt_item.validate()
+
+    def test_null_datetime_constructor(self) -> None:
+        item = pystac.Item.from_file(
+            TestCases.get_path("data-files/item/sample-item.json")
+        )
+        with self.assertRaises(pystac.STACError):
+            Item(
+                "test",
+                geometry=item.geometry,
+                bbox=item.bbox,
+                datetime=None,
+                end_datetime=item.datetime,
+                properties={},
+            )
+        with self.assertRaises(pystac.STACError):
+            Item(
+                "test",
+                geometry=item.geometry,
+                bbox=item.bbox,
+                datetime=None,
+                start_datetime=item.datetime,
+                properties={},
+            )
+        assert item.datetime
+        null_dt_item = Item(
+            "test",
+            geometry=item.geometry,
+            bbox=item.bbox,
+            datetime=None,
+            start_datetime=item.datetime,
+            end_datetime=item.datetime + dateutil.relativedelta.relativedelta(days=1),
+            properties={},
+        )
         null_dt_item.validate()
 
     def test_get_set_asset_datetime(self) -> None:

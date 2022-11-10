@@ -8,6 +8,7 @@
 - Adds custom `header` support to `DefaultStacIO` ([#889](https://github.com/stac-utils/pystac/pull/889))
 - Python 3.11 checks in CI ([#908](https://github.com/stac-utils/pystac/pull/908))
 - Add the optional argument timespec to datetime_to_str function in utils ([#929](https://github.com/stac-utils/pystac/pull/929))
+- `start_datetime` and `end_datetime` arguments to the `Item` constructor ([#918](https://github.com/stac-utils/pystac/pull/918))
 
 ### Removed
 

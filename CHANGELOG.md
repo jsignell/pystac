@@ -6,6 +6,7 @@
 
 - Adds custom `header` support to `DefaultStacIO` ([#889](https://github.com/stac-utils/pystac/pull/889))
 - Python 3.11 checks in CI ([#908](https://github.com/stac-utils/pystac/pull/908))
+- `AsIsLayoutStrategy` ([#919](https://github.com/stac-utils/pystac/pull/919))
 
 ### Removed
 

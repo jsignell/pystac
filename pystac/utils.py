@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib
 import os
 import posixpath
 import warnings
@@ -612,3 +613,18 @@ def _is_url(href: str) -> bool:
     """Checks if an HREF is a url rather than a local path"""
     parsed = safe_urlparse(href)
     return parsed.scheme not in ["", "file"]
+
+
+def _import_optional_dependency(name: str) -> Any:
+    try:
+        module = importlib.import_module(name)
+    except ImportError as e:
+        if e.msg == f"No module named {name!r}":
+            raise ImportError(
+                f"{name} is not installed.\n\n"
+                f"Please install {name}:\n\n"
+                f"  pip install {name}"
+            ) from e
+        else:
+            raise
+    return module

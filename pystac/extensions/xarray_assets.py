@@ -7,6 +7,7 @@ from typing import Any, Generic, Literal, TypeVar
 import pystac
 from pystac.extensions.base import ExtensionManagementMixin, PropertiesExtension
 from pystac.extensions.hooks import ExtensionHooks
+from pystac.utils import _import_optional_dependency
 
 #: Generalized version of :class:`~pystac.Collection`,
 #: :class:`~pystac.Item`, or :class:`~pystac.Asset`
@@ -109,6 +110,31 @@ class ItemXarrayAssetsExtension(XarrayAssetsExtension[pystac.Item]):
     def __repr__(self) -> str:
         return f"<ItemXarrayAssetsExtension Item id={self.item.id}>"
 
+    def open(self, **kwargs: Any) -> Any:
+        """Open a PySTAC item as an xarray dataset.
+
+        Stacks assets into a dataset with 1 more dimension than
+        any given asset using either `odc-stac <https://github.com/opendatacube/odc-stac>`_
+        or `stackstac <https://github.com/gjoseph92/stackstac>`_
+
+        See https://github.com/stac-utils/xpystac for more information
+
+        Parameters
+        ----------
+        stacking_library : "odc.stac", "stackstac", optional
+            When stacking multiple items, this argument determines which library
+            to use. Defaults to ``odc.stac`` if available and otherwise ``stackstac``.
+        patch_url : Callable, optional
+            Function that takes a string or pystac object and returns an altered
+            version. Normally used to sign urls before trying to read data from
+            them. For instance when working with Planetary Computer this argument
+            should be set to ``pc.sign``.
+        **kwargs : Additional keyword arguments to pass to ``xarray.open_dataset``
+        """
+        xpystac = _import_optional_dependency("xpystac")  # mypy: ignore-errors
+
+        return xpystac.to_xarray(self.item, **kwargs)
+
 
 class AssetXarrayAssetsExtension(XarrayAssetsExtension[pystac.Asset]):
     """A concrete implementation of :class:`XarrayAssetsExtension` on an
@@ -155,6 +181,28 @@ class AssetXarrayAssetsExtension(XarrayAssetsExtension[pystac.Asset]):
 
     def __repr__(self) -> str:
         return f"<AssetXarrayAssetsExtension Asset href={self.asset.href}>"
+
+    def open(self, **kwargs: Any) -> Any:
+        """Open a PySTAC asset as an xarray dataset.
+
+        If the asset points to a kerchunk file or a zarr file,
+        reads the metadata in that file to construct the coordinates of the
+        dataset. If the asset points to a COG, read that.
+
+        See https://github.com/stac-utils/xpystac for more information
+
+        Parameters
+        ----------
+        patch_url : Callable, optional
+            Function that takes a string or pystac object and returns an altered
+            version. Normally used to sign urls before trying to read data from
+            them. For instance when working with Planetary Computer this argument
+            should be set to ``pc.sign``.
+        **kwargs : Additional keyword arguments to pass to ``xarray.open_dataset``
+        """
+        xpystac = _import_optional_dependency("xpystac")  # mypy: ignore-errors
+
+        return xpystac.to_xarray(self.asset, **kwargs)
 
 
 class XarrayAssetsExtensionHooks(ExtensionHooks):

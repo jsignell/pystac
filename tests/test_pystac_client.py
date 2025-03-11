@@ -39,5 +39,5 @@ def test_import_pystac_client_when_not_available(monkeypatch: Any) -> None:
     with pytest.raises(ImportError):
         from pystac_client import Client  # noqa:F401
 
-    with pytest.raises(ImportError, match="Please install pystac-client:"):
+    with pytest.raises(ImportError, match="Please install pystac_client:"):
         from pystac.client import Client  # noqa:F401,F811
